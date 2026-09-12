@@ -40,7 +40,7 @@ export default function ProductCard({ product }) {
         </button>
       </div>
       <div className="product-content">
-        <h3 className="product-title">{product.name}</h3>
+        <h3 className="product-title">{product.id.replace('p', '')}. {product.name}</h3>
         <p className="product-packing">Packing: {product.packing}</p>
         
         <div className="product-pricing">

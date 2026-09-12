@@ -13,7 +13,7 @@ export const categories = [
   { id: 'siren', name: 'SIREN', icon: 'Activity' },
   { id: 'lovely-sparklers', name: 'LOVELY SPARKLERS', icon: 'Sparkles' },
   { id: 'rocket', name: 'ROCKET', icon: 'Rocket' },
-  { id: 'fancy-novelties', name: 'FANCY NOVELTIES', icon: 'Gift' },
+  { id: 'fancy-novelties', name: 'CHILDREN SPECIAL', icon: 'Gift' },
   { id: 'gun-shoot-war', name: 'GUN SHOOT WAR', icon: 'Target' },
   { id: 'multi-colour-fountain', name: 'MULTI COLOUR FOUNTAIN', icon: 'Aperture' },
   { id: 'kids-special', name: 'KIDS SPECIAL', icon: 'Smile' },
