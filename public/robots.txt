@@ -5,4 +5,4 @@ Disallow: /cart
 Disallow: /wishlist
 Disallow: /my-orders
 
-Sitemap: https://kalieswari-crackers.vercel.app/sitemap.xml
+Sitemap: https://www.srikalieswaricrackers.in/sitemap.xml
