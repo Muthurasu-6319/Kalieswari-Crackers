@@ -1,4 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import slider1 from '../assets/Slider1.png';
+import slider3 from '../assets/slider3.png';
+import slider4 from '../assets/slider4.png';
 
 const DataContext = createContext();
 
@@ -21,6 +24,8 @@ export function DataProvider({ children }) {
     ]
   };
   const [invoiceSettings, setInvoiceSettings] = useState(defaultInvoiceSettings);
+  const [showGlobalOffer, setShowGlobalOffer] = useState(false);
+  const [shopBanners, setShopBanners] = useState([slider3, slider4, slider1]);
 
   const [saleEndDate, setSaleEndDate] = useState(() => {
     const d = new Date();
@@ -36,6 +41,10 @@ export function DataProvider({ children }) {
     fetch(`${API_URL}/settings`).then(res => res.json()).then(data => {
       if (data.invoiceSettings) setInvoiceSettings(data.invoiceSettings);
       if (data.saleEndDate) setSaleEndDate(data.saleEndDate);
+      if (data.showGlobalOffer !== undefined) setShowGlobalOffer(data.showGlobalOffer);
+      if (data.shopBanners && data.shopBanners.length > 0) {
+        setShopBanners(data.shopBanners);
+      }
     }).catch(console.error);
   }, []);
 
@@ -55,6 +64,16 @@ export function DataProvider({ children }) {
   const updateInvoiceSettings = (newSettings) => {
     setInvoiceSettings(newSettings);
     updateSettingsAPI('invoiceSettings', newSettings);
+  };
+
+  const handleSetShowGlobalOffer = (value) => {
+    setShowGlobalOffer(value);
+    updateSettingsAPI('showGlobalOffer', value);
+  };
+
+  const handleSetShopBanners = (banners) => {
+    setShopBanners(banners);
+    updateSettingsAPI('shopBanners', banners);
   };
 
   // Products
@@ -126,7 +145,9 @@ export function DataProvider({ children }) {
       addCategory, editCategory, deleteCategory,
       addOrder, updateOrderStatus, deleteOrder,
       updateInvoiceSettings,
-      saleEndDate, setSaleEndDate: handleSetSaleEndDate
+      saleEndDate, setSaleEndDate: handleSetSaleEndDate,
+      showGlobalOffer, setShowGlobalOffer: handleSetShowGlobalOffer,
+      shopBanners, setShopBanners: handleSetShopBanners
     }}>
       {children}
     </DataContext.Provider>

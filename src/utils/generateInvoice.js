@@ -1,7 +1,7 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
-export const generateInvoice = (order, settings) => {
+export const generateInvoice = (order, settings, returnBlob = false) => {
   const doc = new jsPDF();
   
   // Basic Settings
@@ -101,6 +101,10 @@ export const generateInvoice = (order, settings) => {
         doc.text(term, 14, finalY + 36 + (idx * 5));
       }
     });
+  }
+
+  if (returnBlob) {
+    return doc.output('blob');
   }
 
   // Save the PDF

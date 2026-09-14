@@ -100,9 +100,8 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
-  const { cart, totalItems, setIsCartOpen, wishlist } = useContext(CartContext);
+  const { cart, totalItems, setIsCartOpen } = useContext(CartContext);
   const { categories, products } = useData();
-  const { currentUser, logout } = useAuth();
 
   const searchResults = searchQuery.trim() === '' 
     ? [] 
@@ -129,7 +128,7 @@ const Header = () => {
 
         {/* Center: Desktop Navigation Links */}
         <nav className="desktop-nav">
-          <Link to="/" style={{ textDecoration: 'none', color: '#d32f2f', fontWeight: 700 }}>Home</Link>
+          <Link to="/home" style={{ textDecoration: 'none', color: '#d32f2f', fontWeight: 700 }}>Home</Link>
           <Link to="/about" style={{ textDecoration: 'none', color: 'var(--text-main)', fontWeight: 600 }}>About</Link>
           <Link to="/shop" style={{ textDecoration: 'none', color: 'var(--text-main)', fontWeight: 600 }}>Shop</Link>
           
@@ -161,7 +160,7 @@ const Header = () => {
                 <div style={{ background: '#ffd700', color: '#0b1641', padding: '0.25rem 1rem', borderRadius: '20px', fontWeight: 800, fontSize: '0.75rem', marginBottom: '1rem' }}>DEAL OF THE DAY</div>
                 <h4 style={{ fontSize: '1.5rem', fontWeight: 900, marginBottom: '0.5rem' }}>Diamond Pack</h4>
                 <p style={{ color: '#cbd5e1', fontSize: '0.875rem', marginBottom: '1.5rem' }}>45 Unique Items • Save 40%</p>
-                <Link to="/#family-packs" className="btn" style={{ background: 'white', color: '#0b1641', width: '100%', padding: '0.75rem' }}>View Offer</Link>
+                <Link to="/home#family-packs" className="btn" style={{ background: 'white', color: '#0b1641', width: '100%', padding: '0.75rem' }}>View Offer</Link>
               </div>
             </div>
           </div>
@@ -210,16 +209,6 @@ const Header = () => {
             )}
           </div>
 
-          {/* Wishlist Icon */}
-          <Link to="/wishlist" style={{ position: 'relative', color: '#2d3748', display: 'flex', alignItems: 'center', marginRight: '0.5rem', textDecoration: 'none' }}>
-            <Heart size={24} strokeWidth={2} />
-            {wishlist?.length > 0 && (
-              <span style={{ position: 'absolute', top: -8, right: -10, background: '#f5365c', color: 'white', fontSize: '0.75rem', width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 'var(--radius-full)', fontWeight: 'bold' }}>
-                {wishlist.length}
-              </span>
-            )}
-          </Link>
-
           {/* Cart Icon */}
           <button onClick={() => setIsCartOpen(true)} style={{ position: 'relative', color: '#2d3748', display: 'flex', alignItems: 'center', marginRight: '0.5rem', background: 'none', border: 'none', cursor: 'pointer' }}>
             <ShoppingCart size={24} strokeWidth={2} />
@@ -229,35 +218,6 @@ const Header = () => {
               </span>
             )}
           </button>
-
-          {currentUser ? (
-            <div style={{ position: 'relative' }} className="desktop-nav mega-menu-trigger">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', padding: '0.5rem', background: '#f8f9fa', borderRadius: 'var(--radius-full)' }}>
-                <div style={{ width: '32px', height: '32px', background: 'var(--primary-color)', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800 }}>
-                  {currentUser.name.charAt(0).toUpperCase()}
-                </div>
-                <span style={{ fontWeight: 600, fontSize: '0.875rem' }}>{currentUser.name.split(' ')[0]}</span>
-              </div>
-              <div className="mega-menu" style={{ width: '200px', left: 'auto', right: 0, padding: '1rem' }}>
-                <div style={{ paddingBottom: '1rem', borderBottom: '1px solid var(--border-color)', marginBottom: '0.5rem' }}>
-                  <div style={{ fontWeight: 700 }}>{currentUser.name}</div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{currentUser.email}</div>
-                </div>
-                
-                <Link to="/my-orders" style={{ width: '100%', background: 'none', border: 'none', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-main)', textDecoration: 'none', padding: '0.5rem', fontWeight: 600 }}>
-                  <Package size={16} /> My Orders
-                </Link>
-
-                <button onClick={logout} style={{ width: '100%', background: 'none', border: 'none', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#dc2626', cursor: 'pointer', padding: '0.5rem', fontWeight: 600 }}>
-                  <LogOut size={16} /> Logout
-                </button>
-              </div>
-            </div>
-          ) : (
-            <Link to="/login" className="btn btn-primary desktop-nav" style={{ padding: '0.5rem 1.25rem', fontSize: '0.875rem', borderRadius: 'var(--radius-full)', textDecoration: 'none' }}>
-              Sign In
-            </Link>
-          )}
 
           <a href={priceListPdf} download="Kaleeswari_Crackers_Price_List_2026.pdf" className="btn btn-outline" style={{ padding: '0.5rem 1.25rem', fontSize: '0.875rem', borderRadius: 'var(--radius-sm)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600, textDecoration: 'none' }}>
             <Download size={18} /> <span className="desktop-nav">Price List</span>
@@ -280,7 +240,7 @@ const Header = () => {
             
             {/* Main Links */}
             <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', borderBottom: '4px solid #f1f5f9' }}>
-              <Link to="/" style={{ textDecoration: 'none', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '1rem', fontWeight: 600 }} onClick={() => setIsMenuOpen(false)}>Home</Link>
+              <Link to="/home" style={{ textDecoration: 'none', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '1rem', fontWeight: 600 }} onClick={() => setIsMenuOpen(false)}>Home</Link>
               <Link to="/about" style={{ textDecoration: 'none', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '1rem', fontWeight: 600 }} onClick={() => setIsMenuOpen(false)}>About</Link>
               <Link to="/shop" style={{ textDecoration: 'none', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '1rem', fontWeight: 600 }} onClick={() => setIsMenuOpen(false)}>Shop</Link>
               <Link to="/contact" style={{ textDecoration: 'none', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '1rem', fontWeight: 600 }} onClick={() => setIsMenuOpen(false)}>Contact</Link>
@@ -317,6 +277,7 @@ import CategoriesAdmin from './pages/admin/CategoriesAdmin';
 import OrdersAdmin from './pages/admin/OrdersAdmin';
 import CustomersAdmin from './pages/admin/CustomersAdmin';
 import SettingsAdmin from './pages/admin/SettingsAdmin';
+import BannersAdmin from './pages/admin/BannersAdmin';
 import Footer from './components/Footer';
 import About from './pages/About';
 import Contact from './pages/Contact';
@@ -363,9 +324,7 @@ function App() {
           <Route path="products" element={<ProductsAdmin />} />
           <Route path="blogs" element={<div>Blogs Page</div>} />
           <Route path="settings" element={<SettingsAdmin />} />
-          <Route path="banners/home" element={<div>Home Banners Page</div>} />
-          <Route path="banners/shop" element={<div>Shop Banners Page</div>} />
-          <Route path="banners/offer" element={<div>Offer Banners Page</div>} />
+          <Route path="banners" element={<BannersAdmin />} />
         </Route>
       </Routes>
     );

@@ -8,9 +8,8 @@ const BottomNav = () => {
   const { totalItems } = useCart();
   
   const navItems = [
-    { path: '/', icon: <Home size={24} />, label: 'Home' },
+    { path: '/home', icon: <Home size={24} />, label: 'Home' },
     { path: '/categories', icon: <Grid size={24} />, label: 'Categories' },
-    { path: '/my-orders', icon: <User size={24} />, label: 'Profile' },
     { path: '/cart', icon: <ShoppingCart size={24} />, label: 'Cart', badge: totalItems > 0 ? totalItems : null },
     { path: 'whatsapp', icon: <MessageCircle size={24} />, label: 'WhatsApp', isExternal: true }
   ];

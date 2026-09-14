@@ -1,12 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Search, ChevronDown } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import slider1 from '../assets/Slider1.png';
+import slider3 from '../assets/slider3.png';
+import slider4 from '../assets/slider4.png';
 import { useData } from '../contexts/DataContext';
 
 export default function Shop() {
-  const { categories, products } = useData();
+  const { categories, products, shopBanners } = useData();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const urlCategory = searchParams.get('category');
@@ -42,16 +44,44 @@ export default function Shop() {
   ];
 
 
-  const sliderImages = [
-    slider1,
-    "https://images.unsplash.com/photo-1513364964177-3e120894c038?q=80&w=1200&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1498622176861-12711680d944?q=80&w=1200&auto=format&fit=crop"
+  const defaultSliderImages = [
+    slider3,
+    slider4,
+    slider1
   ];
+
+  const activeBanners = shopBanners && shopBanners.length > 0 ? shopBanners : defaultSliderImages;
 
   const [selectedCategories, setSelectedCategories] = useState(urlCategory ? [urlCategory] : []);
   const [selectedPrice, setSelectedPrice] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [visibleCount, setVisibleCount] = useState(18);
+  const sliderRef = useRef(null);
+
+  // Auto slide effect
+  useEffect(() => {
+    if (!sliderRef.current || activeBanners.length <= 1) return;
+    
+    const interval = setInterval(() => {
+      const container = sliderRef.current;
+      const scrollLeft = container.scrollLeft;
+      const itemWidth = container.clientWidth;
+      
+      let nextScroll = scrollLeft + itemWidth;
+      
+      // If reached the end, scroll back to start
+      if (nextScroll >= container.scrollWidth - 10) {
+        nextScroll = 0;
+      }
+      
+      container.scrollTo({
+        left: nextScroll,
+        behavior: 'smooth'
+      });
+    }, 4000); // 4 seconds
+    
+    return () => clearInterval(interval);
+  }, [activeBanners]);
 
   // Reset visible count if filters change
   useEffect(() => {
@@ -95,17 +125,17 @@ export default function Shop() {
 
   return (
     <div style={{ paddingBottom: '6rem' }}>
+      {/* Slider Section - Full Width */}
+      <section className="slider-container" ref={sliderRef} style={{ margin: 0, paddingBottom: 0, marginBottom: '2rem' }}>
+        {activeBanners.map((src, index) => (
+          <div key={index} className="slider-item" style={{ borderRadius: 0, boxShadow: 'none' }}>
+            <img src={src} alt={`Festival Banner ${index + 1}`} style={{ objectFit: 'cover' }} />
+          </div>
+        ))}
+      </section>
+
       <div className="container" style={{ paddingTop: '1rem' }}>
         
-        {/* Slider Section */}
-        <section className="slider-container">
-          {sliderImages.map((src, index) => (
-            <div key={index} className="slider-item">
-              <img src={src} alt={`Festival Banner ${index + 1}`} />
-            </div>
-          ))}
-        </section>
-
         {/* Main Content: Left Filter & Right Products */}
         <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
           

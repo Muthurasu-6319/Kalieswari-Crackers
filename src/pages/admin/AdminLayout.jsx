@@ -25,6 +25,7 @@ export default function AdminLayout() {
     { name: 'Orders', path: '/admin/orders', icon: <Package size={20} /> },
     { name: 'Categories', path: '/admin/categories', icon: <Package size={20} /> },
     { name: 'Products', path: '/admin/products', icon: <Package size={20} /> },
+    { name: 'Banners', path: '/admin/banners', icon: <Image size={20} /> },
     { name: 'Blogs', path: '/admin/blogs', icon: <FileText size={20} /> },
     { name: 'Settings', path: '/admin/settings', icon: <Settings size={20} /> },
   ];
@@ -54,30 +55,6 @@ export default function AdminLayout() {
               {item.icon} {item.name}
             </Link>
           ))}
-
-          {/* Banners Dropdown */}
-          <div>
-            <div 
-              onClick={() => setIsBannersOpen(!isBannersOpen)}
-              style={{ 
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem 1rem', 
-                color: '#cbd5e1', cursor: 'pointer', borderRadius: 'var(--radius-sm)', fontWeight: 600
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <Image size={20} /> Banners
-              </div>
-              <ChevronDown size={16} style={{ transform: isBannersOpen ? 'rotate(180deg)' : 'rotate(0)' }} />
-            </div>
-            
-            {isBannersOpen && (
-              <div style={{ display: 'flex', flexDirection: 'column', marginLeft: '2.5rem', marginTop: '0.25rem', gap: '0.25rem' }}>
-                <Link to="/admin/banners/home" style={{ color: '#94a3b8', textDecoration: 'none', padding: '0.5rem', fontSize: '0.875rem' }}>- Home</Link>
-                <Link to="/admin/banners/shop" style={{ color: '#94a3b8', textDecoration: 'none', padding: '0.5rem', fontSize: '0.875rem' }}>- Shop</Link>
-                <Link to="/admin/banners/offer" style={{ color: '#94a3b8', textDecoration: 'none', padding: '0.5rem', fontSize: '0.875rem' }}>- Offer</Link>
-              </div>
-            )}
-          </div>
         </nav>
 
         <div style={{ padding: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>

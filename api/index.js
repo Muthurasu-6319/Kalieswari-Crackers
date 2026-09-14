@@ -2,11 +2,42 @@ import express from 'express';
 import cors from 'cors';
 import pool from './db.js';
 import dotenv from 'dotenv';
+import multer from 'multer';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { v2 as cloudinary } from 'cloudinary';
+import fs from 'fs';
+
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// Configure Cloudinary
+cloudinary.config({ 
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
+  api_key: process.env.CLOUDINARY_API_KEY, 
+  api_secret: process.env.CLOUDINARY_API_SECRET 
+});
+
+// Serve static uploads
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Configure Multer
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, 'uploads'))
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+    cb(null, uniqueSuffix + path.extname(file.originalname))
+  }
+});
+const upload = multer({ storage: storage });
 
 // --- USERS API ---
 app.get('/api/users', async (req, res) => {
@@ -39,28 +70,56 @@ app.delete('/api/users/:id', async (req, res) => {
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
+// --- FILE UPLOAD API ---
+app.post('/api/upload', upload.single('image'), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'No file uploaded' });
+  }
+
+  try {
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: 'kaleeswari_crackers',
+      resource_type: 'auto'
+    });
+    
+    try {
+      fs.unlinkSync(req.file.path);
+    } catch (e) {
+      console.error("Error deleting temp file:", e);
+    }
+    
+    res.json({ url: result.secure_url });
+  } catch (error) {
+    console.error("Cloudinary upload error:", error);
+    res.status(500).json({ error: 'Failed to upload image' });
+  }
+});
+
 // --- PRODUCTS API ---
 app.get('/api/products', async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT * FROM products');
-    res.json(rows);
+    const products = rows.map(r => ({ ...r, mrp: r.sellingPrice }));
+    res.json(products);
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
 app.post('/api/products', async (req, res) => {
-  const { id, name, categoryId, packing, referencePrice, sellingPrice, image } = req.body;
+  const { id, name, categoryId, packing, referencePrice, sellingPrice, mrp, image } = req.body;
+  const sp = sellingPrice !== undefined ? sellingPrice : mrp;
   try {
     await pool.query('INSERT INTO products (id, name, categoryId, packing, referencePrice, sellingPrice, image) VALUES (?, ?, ?, ?, ?, ?, ?)', 
-      [id, name, categoryId, packing, referencePrice, sellingPrice, image]);
+      [id, name, categoryId, packing, referencePrice, sp, image]);
     res.json(req.body);
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
 app.put('/api/products/:id', async (req, res) => {
-  const { name, categoryId, packing, referencePrice, sellingPrice, image } = req.body;
+  const { name, categoryId, packing, referencePrice, sellingPrice, mrp, image } = req.body;
+  const sp = sellingPrice !== undefined ? sellingPrice : mrp;
   try {
     await pool.query('UPDATE products SET name=?, categoryId=?, packing=?, referencePrice=?, sellingPrice=?, image=? WHERE id=?', 
-      [name, categoryId, packing, referencePrice, sellingPrice, image, req.params.id]);
+      [name, categoryId, packing, referencePrice, sp, image, req.params.id]);
     res.json({ success: true });
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
@@ -149,7 +208,13 @@ app.get('/api/settings', async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT * FROM settings');
     const settingsObj = {};
-    rows.forEach(r => settingsObj[r.setting_key] = JSON.parse(r.setting_value));
+    rows.forEach(r => {
+      try {
+        settingsObj[r.setting_key] = typeof r.setting_value === 'string' ? JSON.parse(r.setting_value) : r.setting_value;
+      } catch (e) {
+        settingsObj[r.setting_key] = r.setting_value;
+      }
+    });
     res.json(settingsObj);
   } catch (error) { res.status(500).json({ error: error.message }); }
 });

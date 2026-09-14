@@ -3,7 +3,7 @@ import { useData } from '../../contexts/DataContext';
 import { Save, Settings, Calendar, FileText } from 'lucide-react';
 
 export default function SettingsAdmin() {
-  const { saleEndDate, setSaleEndDate, invoiceSettings, updateInvoiceSettings } = useData();
+  const { saleEndDate, setSaleEndDate, invoiceSettings, updateInvoiceSettings, showGlobalOffer, setShowGlobalOffer } = useData();
   
   // --- Timer Settings State ---
   const formatForInput = (isoString) => {
@@ -90,6 +90,28 @@ export default function SettingsAdmin() {
         >
           <Save size={18} /> {isTimerSaved ? 'Saved!' : 'Save Timer'}
         </button>
+      </div>
+
+      {/* Global Offer Settings Section */}
+      <div style={{ background: 'white', padding: '2rem', borderRadius: 'var(--radius-lg)', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '2rem' }}>
+        <h2 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <Settings size={20} className="text-primary" />
+          Global Offer Settings
+        </h2>
+        
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginBottom: '1rem' }}>
+          Enable or disable the animated "90% Offer" badge on all products in the shop.
+        </p>
+
+        <label style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', userSelect: 'none' }}>
+          <input 
+            type="checkbox" 
+            checked={showGlobalOffer}
+            onChange={(e) => setShowGlobalOffer(e.target.checked)}
+            style={{ width: '20px', height: '20px', accentColor: 'var(--primary-color)' }}
+          />
+          <span style={{ fontWeight: 600, fontSize: '1rem' }}>Show 90% Offer Badge on Products</span>
+        </label>
       </div>
 
       {/* Invoice Settings Section */}

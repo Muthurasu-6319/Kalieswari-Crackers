@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /cart
+Disallow: /wishlist
+Disallow: /my-orders
+
+Sitemap: https://kalieswari-crackers.vercel.app/sitemap.xml

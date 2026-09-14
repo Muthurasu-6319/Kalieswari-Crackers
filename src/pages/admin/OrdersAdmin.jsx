@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { useData } from '../../contexts/DataContext';
-import { Package, Clock, CheckCircle, Truck, PackageCheck, AlertCircle, Eye, Search, MessageCircle, Trash2, FileText } from 'lucide-react';
+import { Package, Clock, CheckCircle, Truck, PackageCheck, AlertCircle, Eye, Search, MessageCircle, Trash2, FileText, Loader2 } from 'lucide-react';
 import { generateInvoice } from '../../utils/generateInvoice';
 
 export default function OrdersAdmin() {
   const { orders, updateOrderStatus, deleteOrder, invoiceSettings } = useData();
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('All');
+  const [processingOrder, setProcessingOrder] = useState(null);
 
   const filteredOrders = orders
     .filter(o => 
@@ -37,21 +38,44 @@ export default function OrdersAdmin() {
     }
   };
 
-  const handleSendInvoice = (order) => {
+  const handleSendInvoice = async (order) => {
     if (!order.customerPhone) {
       alert("No phone number recorded for this customer.");
       return;
     }
     
-    const websiteUrl = window.location.origin;
-    const message = `Hello ${order.customerName},\n\nGreat news! Your order #${order.id} has been successfully confirmed. 🎉\n\nTotal Amount: ₹${order.totalValue}\n\nYour official invoice has been generated. You can view and download your invoice directly from your Orders page here:\n${websiteUrl}/my-orders\n\nWe will notify you again once your order is shipped. Thank you for shopping with Sri Kalieswaari Crackers!`;
-    const encodedMessage = encodeURIComponent(message);
+    setProcessingOrder(order.id);
     
-    // Ensure the phone number has country code. Remove spaces/pluses.
-    let phone = order.customerPhone.replace(/[^0-9]/g, '');
-    if (phone.length === 10) phone = '91' + phone; // default to India if only 10 digits
-    
-    window.open(`https://wa.me/${phone}?text=${encodedMessage}`, '_blank');
+    try {
+      const pdfBlob = generateInvoice(order, invoiceSettings, true);
+      const formData = new FormData();
+      formData.append('image', pdfBlob, `Invoice_${order.id}.pdf`);
+      
+      const API_URL = import.meta.env.DEV ? 'http://localhost:3001/api' : '/api';
+      const res = await fetch(`${API_URL}/upload`, {
+        method: 'POST',
+        body: formData
+      });
+      
+      const data = await res.json();
+      
+      if (data.url) {
+        const message = `Hello ${order.customerName},\n\nGreat news! Your order #${order.id} has been successfully confirmed. 🎊\n\nTotal Amount: ₹${order.totalValue}\n\nYour official invoice has been generated. You can view and download your invoice directly here:\n${data.url}\n\nWe will notify you again once your order is shipped. Thank you for shopping with Sri Kalieswaari Crackers!`;
+        const encodedMessage = encodeURIComponent(message);
+        
+        let phone = order.customerPhone.replace(/[^0-9]/g, '');
+        if (phone.length === 10) phone = '91' + phone; 
+        
+        window.open(`https://wa.me/${phone}?text=${encodedMessage}`, '_blank');
+      } else {
+        alert("Failed to upload invoice to Cloudinary.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error generating or uploading invoice.");
+    } finally {
+      setProcessingOrder(null);
+    }
   };
 
   const handleDelete = (orderId) => {
@@ -150,9 +174,15 @@ export default function OrdersAdmin() {
                       <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem', flexWrap: 'wrap' }}>
                         <button 
                           onClick={() => handleSendInvoice(order)}
-                          style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', background: '#25d366', color: 'white', border: 'none', padding: '0.4rem 0.75rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', width: 'max-content' }}
+                          style={{ background: '#dcfce7', color: '#16a34a', border: 'none', padding: '0.5rem', borderRadius: '6px', cursor: 'pointer' }}
+                          title="Send Invoice on WhatsApp"
+                          disabled={processingOrder === order.id}
                         >
-                          <MessageCircle size={14} /> Send Invoice
+                          {processingOrder === order.id ? (
+                            <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} />
+                          ) : (
+                            <MessageCircle size={18} />
+                          )}
                         </button>
                         
                         <button 

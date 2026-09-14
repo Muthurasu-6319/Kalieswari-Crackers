@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "canvas-confetti": "^1.9.4",
+    "cloudinary": "^2.11.0",
     "concurrently": "^10.0.5",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
@@ -20,7 +21,10 @@
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.8",
     "lucide-react": "^1.44.0",
+    "multer": "^2.4.0",
     "mysql2": "^3.24.4",
+    "pdf-parse": "^2.4.5",
+    "pdf2json": "^4.1.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.18.3"
