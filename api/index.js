@@ -6,6 +6,7 @@ import multer from 'multer';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { v2 as cloudinary } from 'cloudinary';
+import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
 import fs from 'fs';
 
 dotenv.config();
@@ -23,6 +24,19 @@ cloudinary.config({
   api_key: process.env.CLOUDINARY_API_KEY, 
   api_secret: process.env.CLOUDINARY_API_SECRET 
 });
+
+// Configure Backblaze B2 (S3 API)
+let b2;
+if (process.env.B2_ENDPOINT) {
+  b2 = new S3Client({
+    endpoint: process.env.B2_ENDPOINT,
+    region: process.env.B2_REGION,
+    credentials: {
+      accessKeyId: process.env.B2_ACCESS_KEY_ID,
+      secretAccessKey: process.env.B2_SECRET_ACCESS_KEY,
+    }
+  });
+}
 
 // Serve static uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -77,21 +91,60 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
   }
 
   try {
-    const result = await cloudinary.uploader.upload(req.file.path, {
-      folder: 'kaleeswari_crackers',
-      resource_type: 'auto'
-    });
-    
-    try {
-      fs.unlinkSync(req.file.path);
-    } catch (e) {
-      console.error("Error deleting temp file:", e);
+    if (req.file.mimetype === 'application/pdf') {
+      if (!b2) {
+        return res.status(500).json({ error: 'B2 credentials not configured' });
+      }
+      // Upload to B2
+      const fileContent = fs.readFileSync(req.file.path);
+      const fileName = `invoices/${Date.now()}-${req.file.originalname}`;
+      
+      const command = new PutObjectCommand({
+        Bucket: process.env.B2_BUCKET_NAME,
+        Key: fileName,
+        Body: fileContent,
+        ContentType: 'application/pdf',
+      });
+      
+      await b2.send(command);
+      
+      try { fs.unlinkSync(req.file.path); } catch (e) { console.error("Error deleting temp file:", e); }
+      
+      // Return just the filename so the frontend can construct the backend proxy URL
+      const baseFilename = fileName.split('/').pop();
+      return res.json({ invoiceId: baseFilename });
+    } else {
+      // Upload to Cloudinary
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: 'kaleeswari_crackers',
+        resource_type: 'auto'
+      });
+      
+      try { fs.unlinkSync(req.file.path); } catch (e) { console.error("Error deleting temp file:", e); }
+      
+      return res.json({ url: result.secure_url });
     }
-    
-    res.json({ url: result.secure_url });
   } catch (error) {
-    console.error("Cloudinary upload error:", error);
-    res.status(500).json({ error: 'Failed to upload image' });
+    console.error("Upload error:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/invoice/:filename', async (req, res) => {
+  try {
+    if (!b2) {
+      return res.status(500).send('B2 credentials not configured');
+    }
+    const command = new GetObjectCommand({
+      Bucket: process.env.B2_BUCKET_NAME,
+      Key: `invoices/${req.params.filename}`
+    });
+    const { Body, ContentType } = await b2.send(command);
+    res.setHeader('Content-Type', ContentType || 'application/pdf');
+    Body.pipe(res);
+  } catch (error) {
+    console.error("Error fetching invoice:", error);
+    res.status(404).send('Invoice not found');
   }
 });
 

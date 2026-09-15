@@ -47,7 +47,8 @@ export default function OrdersAdmin() {
     setProcessingOrder(order.id);
     
     try {
-      const pdfBlob = generateInvoice(order, invoiceSettings, true);
+      const rawBlob = generateInvoice(order, invoiceSettings, true);
+      const pdfBlob = new Blob([rawBlob], { type: 'application/pdf' });
       const formData = new FormData();
       formData.append('image', pdfBlob, `Invoice_${order.id}.pdf`);
       
@@ -59,7 +60,23 @@ export default function OrdersAdmin() {
       
       const data = await res.json();
       
-      if (data.url) {
+      if (data.invoiceId) {
+        // Set production URL to the official domain so customers always see the branded link
+        let backendBaseUrl = 'https://www.srikalieswaricrackers.in';
+        if (import.meta.env.DEV) {
+           backendBaseUrl = 'http://localhost:3001';
+        }
+        const invoiceUrl = `${backendBaseUrl}/api/invoice/${data.invoiceId}`;
+        
+        const message = `Hello ${order.customerName},\n\nGreat news! Your order #${order.id} has been successfully confirmed. 🎊\n\nTotal Amount: ₹${order.totalValue}\n\nYour official invoice has been generated. You can view and download your invoice directly here:\n${invoiceUrl}\n\nWe will notify you again once your order is shipped. Thank you for shopping with Sri Kalieswaari Crackers!`;
+        const encodedMessage = encodeURIComponent(message);
+        
+        let phone = order.customerPhone.replace(/[^0-9]/g, '');
+        if (phone.length === 10) phone = '91' + phone; 
+        
+        window.open(`https://wa.me/${phone}?text=${encodedMessage}`, '_blank');
+      } else if (data.url) {
+        // Fallback just in case Cloudinary uploads happen
         const message = `Hello ${order.customerName},\n\nGreat news! Your order #${order.id} has been successfully confirmed. 🎊\n\nTotal Amount: ₹${order.totalValue}\n\nYour official invoice has been generated. You can view and download your invoice directly here:\n${data.url}\n\nWe will notify you again once your order is shipped. Thank you for shopping with Sri Kalieswaari Crackers!`;
         const encodedMessage = encodeURIComponent(message);
         
@@ -68,7 +85,7 @@ export default function OrdersAdmin() {
         
         window.open(`https://wa.me/${phone}?text=${encodedMessage}`, '_blank');
       } else {
-        alert("Failed to upload invoice to Cloudinary.");
+        alert(data.error || "Failed to upload invoice to Backblaze B2.");
       }
     } catch (err) {
       console.error(err);

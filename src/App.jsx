@@ -41,10 +41,6 @@ export const CartProvider = ({ children }) => {
   };
 
   const addToCart = (product, quantity = 1) => {
-    if (!currentUser) {
-      navigate('/login');
-      return;
-    }
     setCart(prev => {
       const existing = prev.find(item => item.id === product.id);
       if (existing) {
@@ -287,8 +283,6 @@ import CategoriesPage from './pages/Categories';
 import CountdownTimer from './components/CountdownTimer';
 import BottomNav from './components/BottomNav';
 import QuickViewModal from './components/QuickViewModal';
-import Login from './pages/Login';
-import Signup from './pages/Signup';
 import WishlistPage from './pages/Wishlist';
 import MyOrders from './pages/MyOrders';
 import { Package } from 'lucide-react';
@@ -346,8 +340,6 @@ function App() {
           <Route path="/search" element={<SearchPage />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/more" element={<MorePage />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
           <Route path="/wishlist" element={<WishlistPage />} />
           <Route path="/my-orders" element={<MyOrders />} />
         </Routes>

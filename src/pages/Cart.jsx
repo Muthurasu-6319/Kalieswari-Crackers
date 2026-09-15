@@ -33,21 +33,18 @@ export default function Cart() {
     const encodedMessage = encodeURIComponent(message);
     const shopPhoneNumber = "916380116372"; // WhatsApp Number
     
-    // Save the order to our database
-    if (currentUser) {
-      const newOrder = {
-        id: Date.now().toString(),
-        userId: currentUser.id,
-        customerName: formData.name,
-        customerPhone: formData.phone,
-        customerLocation: formData.location,
-        items: cart,
-        totalValue: totalValue,
-        status: 'Pending',
-        date: new Date().toISOString()
-      };
-      addOrder(newOrder);
-    }
+    const newOrder = {
+      id: Date.now().toString(),
+      userId: currentUser ? currentUser.id : 'guest',
+      customerName: formData.name,
+      customerPhone: formData.phone,
+      customerLocation: formData.location,
+      items: cart,
+      totalValue: totalValue,
+      status: 'Pending',
+      date: new Date().toISOString()
+    };
+    addOrder(newOrder);
     
     // Clear cart by setting quantities to 0 via removeFromCart in a loop, or just open WhatsApp for now.
     // We'll leave the cart alone as they might want to come back if WhatsApp failed, or we can just open it.
