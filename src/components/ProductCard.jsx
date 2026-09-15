@@ -1,30 +1,67 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { CartContext, useQuickView } from '../App';
 import { Eye, Heart } from 'lucide-react';
 import { useData } from '../contexts/DataContext';
 
 export default function ProductCard({ product }) {
-  const { addToCart, wishlist, toggleWishlist } = useContext(CartContext);
+  const { cart, addToCart, removeFromCart, updateQuantity, wishlist, toggleWishlist } = useContext(CartContext);
   const isWishlisted = wishlist?.some(item => item.id === product.id);
   const { setQuickViewProduct } = useQuickView();
   const { showGlobalOffer } = useData();
 
+  const cartItem = cart?.find(item => item.id === product.id);
+  const currentQty = cartItem ? cartItem.quantity : 0;
+  const [localQty, setLocalQty] = useState(1);
+
+  const handleIncrease = (e) => {
+    e.stopPropagation();
+    if (cartItem) {
+      // If already in cart, update cart quantity directly
+      updateQuantity(product.id, currentQty + 1);
+    } else {
+      setLocalQty(prev => prev + 1);
+    }
+  };
+
+  const handleDecrease = (e) => {
+    e.stopPropagation();
+    if (cartItem) {
+      if (currentQty > 1) {
+        updateQuantity(product.id, currentQty - 1);
+      } else {
+        removeFromCart(product.id);
+      }
+    } else {
+      if (localQty > 1) {
+        setLocalQty(prev => prev - 1);
+      }
+    }
+  };
+
+  const handleOrderNow = (e) => {
+    e.stopPropagation();
+    if (!cartItem) {
+      addToCart(product, localQty);
+      setLocalQty(1); // Reset local qty after adding
+    }
+  };
+
   return (
     <div className="product-card">
       <div 
-        style={{ position: 'relative', height: '200px', cursor: 'pointer', overflow: 'hidden' }}
         onClick={() => setQuickViewProduct(product)}
-        className="quick-view-container"
+        className="product-image-container quick-view-container"
       >
         <style>
           {`
             .quick-view-container .quick-view-overlay { opacity: 0; transition: opacity 0.3s; }
             .quick-view-container:hover .quick-view-overlay { opacity: 1; }
-            .quick-view-container img { transition: transform 0.3s; }
-            .quick-view-container:hover img { transform: scale(1.05); }
+            @media (max-width: 640px) {
+              .quick-view-container:hover .quick-view-overlay { display: none; }
+            }
           `}
         </style>
-        <img src={product.image} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        <img src={product.image} alt={product.name} className="product-image" />
         
         {/* Quick View Overlay on Hover */}
         <div className="quick-view-overlay" style={{ position: 'absolute', inset: 0, background: 'rgba(11,22,65,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -58,12 +95,43 @@ export default function ProductCard({ product }) {
           )}
         </div>
 
-        <div style={{ marginTop: 'auto', display: 'flex', gap: '0.5rem', flexDirection: 'column' }}>
+        <div className="product-actions" style={{ marginTop: 'auto', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+          {/* Quantity Selector */}
+          <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #cbd5e1', borderRadius: '4px', overflow: 'hidden', height: '36px' }}>
+            <button 
+              onClick={handleDecrease}
+              style={{ background: 'transparent', border: 'none', color: '#dc2626', width: '30px', height: '100%', cursor: 'pointer', fontWeight: 800 }}
+            >
+              -
+            </button>
+            <div style={{ width: '35px', textAlign: 'center', fontSize: '0.875rem', fontWeight: 600, color: '#475569', display: 'flex', alignItems: 'center', justifyContent: 'center', borderLeft: '1px solid #cbd5e1', borderRight: '1px solid #cbd5e1', height: '100%' }}>
+              {cartItem ? currentQty : localQty}
+            </div>
+            <button 
+              onClick={handleIncrease}
+              style={{ background: 'transparent', border: 'none', color: '#dc2626', width: '30px', height: '100%', cursor: 'pointer', fontWeight: 800 }}
+            >
+              +
+            </button>
+          </div>
+          
+          {/* Order Now Button */}
           <button 
-            className="btn btn-primary" 
-            onClick={() => addToCart(product)}
+            onClick={handleOrderNow}
+            style={{ 
+              flex: 1, 
+              background: cartItem ? '#22c55e' : '#b91c1c', 
+              color: 'white', 
+              border: 'none', 
+              borderRadius: '4px', 
+              height: '36px',
+              fontWeight: 800, 
+              fontSize: '0.875rem',
+              cursor: cartItem ? 'default' : 'pointer',
+              transition: 'background 0.2s'
+            }}
           >
-            Add to Enquiry
+            {cartItem ? 'ADDED' : 'ORDER NOW'}
           </button>
         </div>
       </div>

@@ -13,7 +13,7 @@ export default function Home() {
     window.open(`https://wa.me/${shopPhoneNumber}?text=${encodeURIComponent(text)}`, '_blank');
   };
 
-  const bestSellers = products.filter(p => p.isBestSeller);
+  const bestSellers = products.filter(p => p.isBestSeller && p.isActive !== false && p.isActive !== 0);
 
   return (
     <div style={{ paddingBottom: '6rem', backgroundColor: '#fafafa' }}>

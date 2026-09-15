@@ -95,6 +95,35 @@ export default function OrdersAdmin() {
     }
   };
 
+  const handleSendWhatsApp = async (order) => {
+    if (!order.customerPhone) {
+      alert("No phone number recorded for this customer.");
+      return;
+    }
+
+    if (order.status === 'Confirmed') {
+      await handleSendInvoice(order);
+      return;
+    }
+
+    let phone = order.customerPhone.replace(/[^0-9]/g, '');
+    if (phone.length === 10) phone = '91' + phone; 
+
+    let message = '';
+    if (order.status === 'Shipped') {
+      message = `Hello ${order.customerName},\n\nGood news! Your order #${order.id} has been shipped. 🚚\n\nDid you receive your product? Please let us know once it reaches you.\n\nThank you for shopping with Sri Kalieswaari Crackers!`;
+    } else if (order.status === 'Delivered') {
+      message = `Hello ${order.customerName},\n\nYour order #${order.id} has been successfully delivered. 🎉\n\nWe hope you have a wonderful celebration! Thank you for choosing Sri Kalieswaari Crackers.`;
+    } else if (order.status === 'Cancelled') {
+      message = `Hello ${order.customerName},\n\nWe regret to inform you that your order #${order.id} has been cancelled. ❌\n\nIf you have any questions or would like to place a new order, please feel free to contact us.\n\nThank you for your understanding.`;
+    }
+
+    if (message) {
+      const encodedMessage = encodeURIComponent(message);
+      window.open(`https://wa.me/${phone}?text=${encodedMessage}`, '_blank');
+    }
+  };
+
   const handleDelete = (orderId) => {
     if (window.confirm("Are you sure you want to completely delete this order? This action cannot be undone.")) {
       deleteOrder(orderId);
@@ -133,7 +162,7 @@ export default function OrdersAdmin() {
         </div>
       </div>
 
-      <div style={{ background: 'white', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', overflow: 'hidden' }}>
+      <div className="admin-table-container" style={{ background: 'white', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
           <thead style={{ background: '#f8f9fa', borderBottom: '1px solid var(--border-color)' }}>
             <tr>
@@ -187,12 +216,12 @@ export default function OrdersAdmin() {
                       <option value="Delivered">Delivered</option>
                       <option value="Cancelled">Cancelled</option>
                     </select>
-                    {order.status === 'Confirmed' && (
+                    {order.status !== 'Pending' && (
                       <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem', flexWrap: 'wrap' }}>
                         <button 
-                          onClick={() => handleSendInvoice(order)}
+                          onClick={() => handleSendWhatsApp(order)}
                           style={{ background: '#dcfce7', color: '#16a34a', border: 'none', padding: '0.5rem', borderRadius: '6px', cursor: 'pointer' }}
-                          title="Send Invoice on WhatsApp"
+                          title={`Send ${order.status} Message on WhatsApp`}
                           disabled={processingOrder === order.id}
                         >
                           {processingOrder === order.id ? (
@@ -202,12 +231,14 @@ export default function OrdersAdmin() {
                           )}
                         </button>
                         
-                        <button 
-                          onClick={() => generateInvoice(order, invoiceSettings)}
-                          style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', background: 'var(--primary-color)', color: 'white', border: 'none', padding: '0.4rem 0.75rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', width: 'max-content' }}
-                        >
-                          <FileText size={14} /> PDF
-                        </button>
+                        {order.status === 'Confirmed' && (
+                          <button 
+                            onClick={() => generateInvoice(order, invoiceSettings)}
+                            style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', background: 'var(--primary-color)', color: 'white', border: 'none', padding: '0.4rem 0.75rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', width: 'max-content' }}
+                          >
+                            <FileText size={14} /> PDF
+                          </button>
+                        )}
                       </div>
                     )}
                   </td>

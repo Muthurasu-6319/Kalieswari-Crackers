@@ -26,7 +26,8 @@ async function initDb() {
         packing VARCHAR(255),
         referencePrice INT NOT NULL,
         sellingPrice INT NOT NULL,
-        image VARCHAR(1000)
+        image VARCHAR(1000),
+        isActive BOOLEAN DEFAULT TRUE
       )
     `);
     console.log("Products table ready.");

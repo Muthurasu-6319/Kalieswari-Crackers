@@ -5,7 +5,8 @@ import { useData } from '../contexts/DataContext';
 import IconRenderer from '../components/IconRenderer';
 
 const CategoriesPage = () => {
-  const { categories, products } = useData();
+  const { categories, products: allProducts } = useData();
+  const products = allProducts.filter(p => p.isActive !== false && p.isActive !== 0);
 
   return (
     <div style={{ background: '#f8fafc', minHeight: '100vh', paddingBottom: '4rem' }}>

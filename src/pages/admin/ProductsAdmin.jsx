@@ -160,7 +160,7 @@ export default function ProductsAdmin() {
         </div>
       )}
 
-      <div style={{ background: 'white', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', overflow: 'hidden' }}>
+      <div className="admin-table-container" style={{ background: 'white', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
           <thead style={{ background: '#f8f9fa', borderBottom: '1px solid var(--border-color)' }}>
             <tr>
@@ -170,6 +170,7 @@ export default function ProductsAdmin() {
               <th style={{ padding: '1rem', fontWeight: 600 }}>MRP</th>
               <th style={{ padding: '1rem', fontWeight: 600 }}>Selling Price</th>
               <th style={{ padding: '1rem', fontWeight: 600 }}>Discount</th>
+              <th style={{ padding: '1rem', fontWeight: 600 }}>Visibility</th>
               <th style={{ padding: '1rem', fontWeight: 600 }}>Actions</th>
             </tr>
           </thead>
@@ -187,6 +188,24 @@ export default function ProductsAdmin() {
                   <td style={{ padding: '1rem', color: '#9ca3af', textDecoration: 'line-through' }}>₹{product.mrp}</td>
                   <td style={{ padding: '1rem', fontWeight: 600, color: 'var(--primary-color)' }}>₹{product.referencePrice}</td>
                   <td style={{ padding: '1rem', color: 'green', fontWeight: 600 }}>{discount > 0 ? `${discount}% OFF` : '-'}</td>
+                  <td style={{ padding: '1rem' }}>
+                    <button 
+                      onClick={() => editProduct(product.id, { ...product, isActive: product.isActive === false || product.isActive === 0 ? true : false })}
+                      style={{ 
+                        background: product.isActive !== false && product.isActive !== 0 ? '#dcfce7' : '#fee2e2', 
+                        color: product.isActive !== false && product.isActive !== 0 ? '#16a34a' : '#dc2626', 
+                        border: 'none', 
+                        padding: '0.4rem 0.75rem', 
+                        borderRadius: '20px', 
+                        fontWeight: 600,
+                        fontSize: '0.75rem',
+                        cursor: 'pointer',
+                        width: '60px'
+                      }}
+                    >
+                      {product.isActive !== false && product.isActive !== 0 ? 'ON' : 'OFF'}
+                    </button>
+                  </td>
                   <td style={{ padding: '1rem', display: 'flex', gap: '0.5rem' }}>
                     <div style={{ position: 'relative' }}>
                       {uploadingId === product.id ? (

@@ -8,7 +8,8 @@ import slider4 from '../assets/slider4.png';
 import { useData } from '../contexts/DataContext';
 
 export default function Shop() {
-  const { categories, products, shopBanners } = useData();
+  const { categories, products: allProducts, shopBanners } = useData();
+  const products = allProducts.filter(p => p.isActive !== false && p.isActive !== 0);
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const urlCategory = searchParams.get('category');
@@ -56,6 +57,7 @@ export default function Shop() {
   const [selectedPrice, setSelectedPrice] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [visibleCount, setVisibleCount] = useState(18);
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   const sliderRef = useRef(null);
 
   // Auto slide effect
@@ -139,8 +141,20 @@ export default function Shop() {
         {/* Main Content: Left Filter & Right Products */}
         <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
           
+          {/* Mobile Filter Toggle Button */}
+          <div className="mobile-only w-full" style={{ width: '100%', marginBottom: '-1rem' }}>
+            <button 
+              onClick={() => setIsMobileFilterOpen(!isMobileFilterOpen)}
+              className="btn btn-outline"
+              style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+            >
+              <span style={{ fontWeight: 600 }}>Filter & Sort Options</span>
+              <ChevronDown style={{ transform: isMobileFilterOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.3s' }} size={20} />
+            </button>
+          </div>
+
           {/* Left Sidebar: Filters */}
-          <aside style={{ flex: '1 1 250px', maxWidth: '300px' }}>
+          <aside className={`filter-sidebar ${isMobileFilterOpen ? 'open' : ''}`} style={{ flex: '1 1 250px', maxWidth: '300px' }}>
             <div className="bg-surface" style={{ padding: '1.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', position: 'sticky', top: '100px' }}>
               <h3 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '1.5rem', borderBottom: '2px solid var(--primary-color)', paddingBottom: '0.5rem' }}>
                 Filter Options
@@ -201,7 +215,7 @@ export default function Shop() {
                     borderRadius: '20px',
                     border: '1px solid var(--border-color)',
                     background: 'var(--bg-color)',
-                    color: 'white',
+                    color: 'var(--text-main)',
                     outline: 'none'
                   }}
                 />

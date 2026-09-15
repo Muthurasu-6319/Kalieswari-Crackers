@@ -64,7 +64,7 @@ export const CartProvider = ({ children }) => {
 
   const prevTotalRef = useRef(0);
   useEffect(() => {
-    if (prevTotalRef.current < 3000 && totalValue >= 3000) {
+    if (prevTotalRef.current < 2500 && totalValue >= 2500) {
       confetti({
         particleCount: 150,
         spread: 80,
@@ -285,6 +285,7 @@ import BottomNav from './components/BottomNav';
 import QuickViewModal from './components/QuickViewModal';
 import WishlistPage from './pages/Wishlist';
 import MyOrders from './pages/MyOrders';
+import StickyCartBar from './components/StickyCartBar';
 import { Package } from 'lucide-react';
 
 const SearchPage = () => <div className="container" style={{ paddingTop: '2rem' }}><h2>Search</h2></div>;
@@ -346,6 +347,7 @@ function App() {
       </main>
       <Footer />
       <CartDrawer />
+      <StickyCartBar />
       <WhatsAppFab />
       <BottomNav />
       {quickViewProduct && (

@@ -158,21 +158,23 @@ app.get('/api/products', async (req, res) => {
 });
 
 app.post('/api/products', async (req, res) => {
-  const { id, name, categoryId, packing, referencePrice, sellingPrice, mrp, image } = req.body;
+  const { id, name, categoryId, packing, referencePrice, sellingPrice, mrp, image, isActive } = req.body;
   const sp = sellingPrice !== undefined ? sellingPrice : mrp;
+  const active = isActive !== undefined ? isActive : true;
   try {
-    await pool.query('INSERT INTO products (id, name, categoryId, packing, referencePrice, sellingPrice, image) VALUES (?, ?, ?, ?, ?, ?, ?)', 
-      [id, name, categoryId, packing, referencePrice, sp, image]);
+    await pool.query('INSERT INTO products (id, name, categoryId, packing, referencePrice, sellingPrice, image, isActive) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', 
+      [id, name, categoryId, packing, referencePrice, sp, image, active]);
     res.json(req.body);
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
 app.put('/api/products/:id', async (req, res) => {
-  const { name, categoryId, packing, referencePrice, sellingPrice, mrp, image } = req.body;
+  const { name, categoryId, packing, referencePrice, sellingPrice, mrp, image, isActive } = req.body;
   const sp = sellingPrice !== undefined ? sellingPrice : mrp;
+  const active = isActive !== undefined ? isActive : true;
   try {
-    await pool.query('UPDATE products SET name=?, categoryId=?, packing=?, referencePrice=?, sellingPrice=?, image=? WHERE id=?', 
-      [name, categoryId, packing, referencePrice, sp, image, req.params.id]);
+    await pool.query('UPDATE products SET name=?, categoryId=?, packing=?, referencePrice=?, sellingPrice=?, image=?, isActive=? WHERE id=?', 
+      [name, categoryId, packing, referencePrice, sp, image, active, req.params.id]);
     res.json({ success: true });
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
