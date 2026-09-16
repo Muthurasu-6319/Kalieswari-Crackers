@@ -3,14 +3,17 @@ import { CartContext } from '../App';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
 import { Trash2, MessageCircle, ArrowRight } from 'lucide-react';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 export default function Cart() {
   const { cart, removeFromCart, updateQuantity, totalValue, totalItems, setIsCartOpen } = useContext(CartContext);
   const { addOrder } = useData();
   const { currentUser } = useAuth();
   const [formData, setFormData] = useState({ name: '', location: '', phone: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleWhatsApp = () => {
+  const handleWhatsApp = async () => {
     if (totalValue < 2500) {
       alert("Minimum order value is ₹2500. Please add more items to your enquiry.");
       return;
@@ -21,34 +24,96 @@ export default function Cart() {
       return;
     }
 
-    let message = `Hello Sri Kalieswaari Crackers 👋\n\nI would like to enquire about the following products:\n\n`;
-    
-    cart.forEach((item, index) => {
-      message += `${index + 1}. ${item.name} - Qty: ${item.quantity}\n`;
-    });
+    setIsSubmitting(true);
+    try {
+      // Generate PDF
+      const doc = new jsPDF();
+      
+      doc.setFontSize(20);
+      doc.text("Sri Kalieswaari Crackers", 14, 22);
+      doc.setFontSize(12);
+      doc.text("Order Estimate / Enquiry", 14, 30);
+      
+      doc.setFontSize(10);
+      doc.text(`Customer Name: ${formData.name}`, 14, 40);
+      doc.text(`Phone: ${formData.phone}`, 14, 46);
+      doc.text(`Location: ${formData.location}`, 14, 52);
+      doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 58);
 
-    message += `\nEstimated Total: ₹${totalValue}\n\n`;
-    message += `Name: ${formData.name}\nPhone: ${formData.phone}\nLocation: ${formData.location}\n\nPlease confirm availability and final price.\nThank you.`;
+      const tableColumn = ["S.No", "Product Name", "Packing", "Qty", "Price", "Total"];
+      const tableRows = [];
 
-    const encodedMessage = encodeURIComponent(message);
-    const shopPhoneNumber = "916380116372"; // WhatsApp Number
-    
-    const newOrder = {
-      id: Date.now().toString(),
-      userId: currentUser ? currentUser.id : 'guest',
-      customerName: formData.name,
-      customerPhone: formData.phone,
-      customerLocation: formData.location,
-      items: cart,
-      totalValue: totalValue,
-      status: 'Pending',
-      date: new Date().toISOString()
-    };
-    addOrder(newOrder);
-    
-    // Clear cart by setting quantities to 0 via removeFromCart in a loop, or just open WhatsApp for now.
-    // We'll leave the cart alone as they might want to come back if WhatsApp failed, or we can just open it.
-    window.open(`https://wa.me/${shopPhoneNumber}?text=${encodedMessage}`, '_blank');
+      cart.forEach((item, index) => {
+        tableRows.push([
+          index + 1,
+          item.name,
+          item.packing,
+          item.quantity,
+          `Rs ${item.referencePrice}`,
+          `Rs ${item.referencePrice * item.quantity}`
+        ]);
+      });
+
+      doc.autoTable({
+        head: [tableColumn],
+        body: tableRows,
+        startY: 65,
+        theme: 'grid',
+        styles: { fontSize: 9 },
+        headStyles: { fillColor: [211, 47, 47] } 
+      });
+
+      const finalY = doc.lastAutoTable.finalY || 65;
+      
+      doc.setFontSize(12);
+      doc.text(`Estimated Total: Rs ${totalValue}`, 14, finalY + 10);
+      doc.setFontSize(10);
+      doc.text("Please confirm availability and final price.", 14, finalY + 20);
+
+      // Save PDF to Blob and Upload
+      const pdfBlob = doc.output('blob');
+      const formDataObj = new FormData();
+      formDataObj.append('image', pdfBlob, `Order_${formData.name.replace(/\\s+/g, '_')}.pdf`);
+      
+      const API_URL = import.meta.env.DEV ? 'http://localhost:3001/api' : '/api';
+      const baseUrl = import.meta.env.DEV ? 'http://localhost:3001' : window.location.origin;
+
+      const uploadRes = await fetch(`${API_URL}/upload`, {
+        method: 'POST',
+        body: formDataObj
+      });
+      const uploadData = await uploadRes.json();
+      
+      if (!uploadData.invoiceId) {
+        throw new Error("Failed to upload PDF");
+      }
+      
+      const pdfLink = `${baseUrl}/api/invoice/${uploadData.invoiceId}`;
+      const message = `Hello Sri Kalieswaari Crackers 👋\n\nI have placed an order for ₹${totalValue}.\n\nName: ${formData.name}\nPhone: ${formData.phone}\nLocation: ${formData.location}\n\nView my order PDF here: ${pdfLink}\n\nPlease check the PDF for product details and confirm availability.\nThank you.`;
+      
+      const encodedMessage = encodeURIComponent(message);
+      const shopPhoneNumber = "916380116372"; 
+      
+      const newOrder = {
+        id: Date.now().toString(),
+        userId: currentUser ? currentUser.id : 'guest',
+        customerName: formData.name,
+        customerPhone: formData.phone,
+        customerLocation: formData.location,
+        items: cart,
+        totalValue: totalValue,
+        status: 'Pending',
+        date: new Date().toISOString()
+      };
+      addOrder(newOrder);
+      
+      window.open(`https://wa.me/${shopPhoneNumber}?text=${encodedMessage}`, '_blank');
+    } catch (error) {
+      console.error(error);
+      alert("Error generating PDF link. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (cart.length === 0) {
@@ -152,13 +217,13 @@ export default function Cart() {
             className="btn btn-whatsapp" 
             style={{ 
               width: '100%', 
-              opacity: totalValue < 2500 ? 0.5 : 1, 
-              cursor: totalValue < 2500 ? 'not-allowed' : 'pointer' 
+              opacity: (totalValue < 2500 || isSubmitting) ? 0.5 : 1, 
+              cursor: (totalValue < 2500 || isSubmitting) ? 'not-allowed' : 'pointer' 
             }} 
             onClick={handleWhatsApp}
-            disabled={totalValue < 2500}
+            disabled={totalValue < 2500 || isSubmitting}
           >
-            <MessageCircle size={20} /> Send Enquiry on WhatsApp <ArrowRight size={18} />
+            {isSubmitting ? 'Generating PDF...' : <><MessageCircle size={20} /> Send Enquiry on WhatsApp <ArrowRight size={18} /></>}
           </button>
         </div>
 

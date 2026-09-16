@@ -53,7 +53,7 @@ export default function Contact() {
                 <MapPin size={28} color="#d32f2f" />
               </div>
               <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '0.5rem' }}>Our Godown</h3>
-              <p style={{ color: 'var(--text-muted)', lineHeight: 1.6 }}>123 Main Bazaar Road,<br/>Sivakasi, Tamil Nadu - 626123</p>
+              <p style={{ color: 'var(--text-muted)', lineHeight: 1.6 }}>Vembakottai To kalugumalai Main road,<br/>Thulukkankurichi</p>
             </div>
 
             <div style={{ background: 'white', padding: '2rem', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', border: '1px solid var(--border-color)', textAlign: 'center' }}>

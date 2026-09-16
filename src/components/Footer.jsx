@@ -87,7 +87,7 @@ export default function Footer() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
               <MapPin size={20} color="#d32f2f" style={{ flexShrink: 0, marginTop: '4px' }} />
-              <span style={{ color: '#94a3b8' }}>123 Main Bazaar, Sivakasi, Tamil Nadu - 626123, India.</span>
+              <span style={{ color: '#94a3b8' }}>Vembakottai To kalugumalai Main road, Thulukkankurichi</span>
             </div>
             <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
               <Phone size={20} color="#d32f2f" style={{ flexShrink: 0 }} />

@@ -227,7 +227,7 @@ const Header = () => {
 
       {/* Sidebar Overlay (Mobile Menu) */}
       {isMenuOpen && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', zIndex: 100 }} onClick={() => setIsMenuOpen(false)}>
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1001 }} onClick={() => setIsMenuOpen(false)}>
           <div style={{ width: '300px', height: '100%', background: 'white', display: 'flex', flexDirection: 'column', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
             <div style={{ padding: '1rem', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fff5f5' }}>
               <span style={{ fontWeight: 800 }}>MENU</span>
