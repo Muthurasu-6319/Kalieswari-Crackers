@@ -6,7 +6,7 @@ import slider4 from '../assets/slider4.png';
 const DataContext = createContext();
 
 export function DataProvider({ children }) {
-  const API_URL = import.meta.env.DEV ? 'http://localhost:3001/api' : '/api';
+  const API_URL = import.meta.env.DEV ? `http://${window.location.hostname}:3001/api` : '/api';
 
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);

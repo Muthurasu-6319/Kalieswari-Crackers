@@ -20,7 +20,7 @@ export default function ProductsAdmin() {
     formData.append('image', file);
     
     try {
-      const API_URL = import.meta.env.DEV ? 'http://localhost:3001/api' : '/api';
+      const API_URL = import.meta.env.DEV ? `http://${window.location.hostname}:3001/api` : '/api';
       const res = await fetch(`${API_URL}/upload`, {
         method: 'POST',
         body: formData,
@@ -28,7 +28,7 @@ export default function ProductsAdmin() {
       const data = await res.json();
       if (data.url) {
         const isAbsolute = data.url.startsWith('http');
-        setNewProduct(prev => ({ ...prev, image: import.meta.env.DEV && !isAbsolute ? `http://localhost:3001${data.url}` : data.url }));
+        setNewProduct(prev => ({ ...prev, image: import.meta.env.DEV && !isAbsolute ? `http://${window.location.hostname}:3001${data.url}` : data.url }));
       }
     } catch (err) {
       console.error('Upload failed', err);
@@ -44,7 +44,7 @@ export default function ProductsAdmin() {
     formData.append('image', file);
     
     try {
-      const API_URL = import.meta.env.DEV ? 'http://localhost:3001/api' : '/api';
+      const API_URL = import.meta.env.DEV ? `http://${window.location.hostname}:3001/api` : '/api';
       const res = await fetch(`${API_URL}/upload`, {
         method: 'POST',
         body: formData,
@@ -52,7 +52,7 @@ export default function ProductsAdmin() {
       const data = await res.json();
       if (data.url) {
         const isAbsolute = data.url.startsWith('http');
-        const imageUrl = import.meta.env.DEV && !isAbsolute ? `http://localhost:3001${data.url}` : data.url;
+        const imageUrl = import.meta.env.DEV && !isAbsolute ? `http://${window.location.hostname}:3001${data.url}` : data.url;
         
         await editProduct(product.id, { ...product, image: imageUrl });
         

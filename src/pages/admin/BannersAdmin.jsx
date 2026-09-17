@@ -16,7 +16,7 @@ export default function BannersAdmin() {
     formData.append('image', file);
     
     try {
-      const API_URL = import.meta.env.DEV ? 'http://localhost:3001/api' : '/api';
+      const API_URL = import.meta.env.DEV ? `http://${window.location.hostname}:3001/api` : '/api';
       const res = await fetch(`${API_URL}/upload`, {
         method: 'POST',
         body: formData,
@@ -24,7 +24,7 @@ export default function BannersAdmin() {
       const data = await res.json();
       if (data.url) {
         const isAbsolute = data.url.startsWith('http');
-        const imageUrl = import.meta.env.DEV && !isAbsolute ? `http://localhost:3001${data.url}` : data.url;
+        const imageUrl = import.meta.env.DEV && !isAbsolute ? `http://${window.location.hostname}:3001${data.url}` : data.url;
         
         // Add to banners
         const newBanners = [...shopBanners, imageUrl];

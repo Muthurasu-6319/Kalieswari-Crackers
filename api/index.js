@@ -91,7 +91,7 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
   }
 
   try {
-    if (req.file.mimetype === 'application/pdf') {
+    if (req.file.mimetype === 'application/pdf' || req.file.originalname.toLowerCase().endsWith('.pdf')) {
       if (!b2) {
         return res.status(500).json({ error: 'B2 credentials not configured' });
       }

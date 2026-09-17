@@ -5,7 +5,7 @@ const AuthContext = createContext();
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [users, setUsers] = useState([]);
-  const API_URL = import.meta.env.DEV ? 'http://localhost:3001/api' : '/api';
+  const API_URL = import.meta.env.DEV ? `http://${window.location.hostname}:3001/api` : '/api';
 
   // Initialize from localStorage on load
   useEffect(() => {

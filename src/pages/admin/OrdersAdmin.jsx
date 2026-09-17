@@ -52,7 +52,7 @@ export default function OrdersAdmin() {
       const formData = new FormData();
       formData.append('image', pdfBlob, `Invoice_${order.id}.pdf`);
       
-      const API_URL = import.meta.env.DEV ? 'http://localhost:3001/api' : '/api';
+      const API_URL = import.meta.env.DEV ? `http://${window.location.hostname}:3001/api` : '/api';
       const res = await fetch(`${API_URL}/upload`, {
         method: 'POST',
         body: formData
@@ -64,7 +64,7 @@ export default function OrdersAdmin() {
         // Set production URL to the official domain so customers always see the branded link
         let backendBaseUrl = 'https://www.srikalieswaricrackers.in';
         if (import.meta.env.DEV) {
-           backendBaseUrl = 'http://localhost:3001';
+           backendBaseUrl = `http://${window.location.hostname}:3001`;
         }
         const invoiceUrl = `${backendBaseUrl}/api/invoice/${data.invoiceId}`;
         

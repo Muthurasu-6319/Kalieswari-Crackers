@@ -4,7 +4,7 @@ import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
 import { Trash2, MessageCircle, ArrowRight } from 'lucide-react';
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 
 export default function Cart() {
   const { cart, removeFromCart, updateQuantity, totalValue, totalItems, setIsCartOpen } = useContext(CartContext);
@@ -54,7 +54,7 @@ export default function Cart() {
         ]);
       });
 
-      doc.autoTable({
+      autoTable(doc, {
         head: [tableColumn],
         body: tableRows,
         startY: 65,
@@ -75,8 +75,8 @@ export default function Cart() {
       const formDataObj = new FormData();
       formDataObj.append('image', pdfBlob, `Order_${formData.name.replace(/\\s+/g, '_')}.pdf`);
       
-      const API_URL = import.meta.env.DEV ? 'http://localhost:3001/api' : '/api';
-      const baseUrl = import.meta.env.DEV ? 'http://localhost:3001' : window.location.origin;
+      const API_URL = import.meta.env.DEV ? `http://${window.location.hostname}:3001/api` : '/api';
+      const baseUrl = import.meta.env.DEV ? `http://${window.location.hostname}:3001` : window.location.origin;
 
       const uploadRes = await fetch(`${API_URL}/upload`, {
         method: 'POST',
@@ -85,7 +85,7 @@ export default function Cart() {
       const uploadData = await uploadRes.json();
       
       if (!uploadData.invoiceId) {
-        throw new Error("Failed to upload PDF");
+        throw new Error(uploadData.error || "Failed to upload PDF");
       }
       
       const pdfLink = `${baseUrl}/api/invoice/${uploadData.invoiceId}`;
@@ -109,8 +109,8 @@ export default function Cart() {
       
       window.open(`https://wa.me/${shopPhoneNumber}?text=${encodedMessage}`, '_blank');
     } catch (error) {
-      console.error(error);
-      alert("Error generating PDF link. Please try again.");
+      console.error("Upload error details:", error);
+      alert(`Error generating PDF link: ${error.message}`);
     } finally {
       setIsSubmitting(false);
     }
