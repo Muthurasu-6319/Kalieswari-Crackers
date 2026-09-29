@@ -78,7 +78,7 @@ export default function StickyCartBar() {
 
       const pdfBlob = doc.output('blob');
       const formDataObj = new FormData();
-      formDataObj.append('image', pdfBlob, `Order_${formData.name.replace(/\\s+/g, '_')}.pdf`);
+      formDataObj.append('image', pdfBlob, `Order_${formData.name.replace(/\s+/g, '_')}.pdf`);
       
       const API_URL = import.meta.env.DEV ? `http://${window.location.hostname}:3001/api` : '/api';
       const baseUrl = import.meta.env.DEV ? `http://${window.location.hostname}:3001` : window.location.origin;
@@ -93,7 +93,7 @@ export default function StickyCartBar() {
         throw new Error(uploadData.error || "Failed to upload PDF");
       }
       
-      const pdfLink = `${baseUrl}/api/invoice/${uploadData.invoiceId}`;
+      const pdfLink = encodeURI(`${baseUrl}/api/invoice/${uploadData.invoiceId}`);
       const message = `Hello Sri Kalieswaari Crackers 👋\n\nI have placed an order for ₹${totalValue}.\n\nName: ${formData.name}\nPhone: ${formData.phone}\nLocation: ${formData.location}\n\nView my order PDF here: ${pdfLink}\n\nPlease check the PDF for product details and confirm availability.\nThank you.`;
       
       const encodedMessage = encodeURIComponent(message);
