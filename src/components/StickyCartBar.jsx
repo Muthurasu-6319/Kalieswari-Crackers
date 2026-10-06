@@ -148,7 +148,7 @@ export default function StickyCartBar() {
             marginBottom: '-5px',
             boxShadow: '0 -2px 10px rgba(0,0,0,0.1)'
           }}>
-            🔥 Order value must be at least ₹2,500. 🔥
+            🔥 Order value must be at least ₹3,000. 🔥
           </div>
         )}
         
@@ -182,7 +182,7 @@ export default function StickyCartBar() {
           
           {/* Action Button */}
           <button 
-            onClick={() => isEligible ? setIsModalOpen(true) : alert("Please add more items to reach ₹2,500.")}
+            onClick={() => isEligible ? setIsModalOpen(true) : alert("Please add more items to reach ₹3,000.")}
             style={{
               background: isEligible ? '#22c55e' : '#94a3b8',
               color: 'white',
