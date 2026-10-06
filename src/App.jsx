@@ -64,7 +64,7 @@ export const CartProvider = ({ children }) => {
 
   const prevTotalRef = useRef(0);
   useEffect(() => {
-    if (prevTotalRef.current < 2500 && totalValue >= 2500) {
+    if (prevTotalRef.current < 3000 && totalValue >= 3000) {
       confetti({
         particleCount: 150,
         spread: 80,

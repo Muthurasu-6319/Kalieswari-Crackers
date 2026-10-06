@@ -14,8 +14,8 @@ export default function Cart() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleWhatsApp = async () => {
-    if (totalValue < 2500) {
-      alert("Minimum order value is ₹2500. Please add more items to your enquiry.");
+    if (totalValue < 3000) {
+      alert("Minimum order value is ₹3000. Please add more items to your enquiry.");
       return;
     }
 
@@ -174,9 +174,9 @@ export default function Cart() {
             ⚠️ Final price & availability will be confirmed by our team via WhatsApp.
           </div>
 
-          {totalValue < 2500 && (
+          {totalValue < 3000 && (
             <div style={{ padding: '1rem', background: 'rgba(239, 68, 68, 0.1)', color: 'var(--primary-color)', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(239, 68, 68, 0.3)', marginBottom: '1.5rem', fontSize: '0.875rem', fontWeight: 600 }}>
-              ⚠️ Minimum order value is ₹2500. Add ₹{2500 - totalValue} more to checkout.
+              ⚠️ Minimum order value is ₹3000. Add ₹{3000 - totalValue} more to checkout.
             </div>
           )}
 
@@ -217,11 +217,11 @@ export default function Cart() {
             className="btn btn-whatsapp" 
             style={{ 
               width: '100%', 
-              opacity: (totalValue < 2500 || isSubmitting) ? 0.5 : 1, 
-              cursor: (totalValue < 2500 || isSubmitting) ? 'not-allowed' : 'pointer' 
+              opacity: (totalValue < 3000 || isSubmitting) ? 0.5 : 1, 
+              cursor: (totalValue < 3000 || isSubmitting) ? 'not-allowed' : 'pointer' 
             }} 
             onClick={handleWhatsApp}
-            disabled={totalValue < 2500 || isSubmitting}
+            disabled={totalValue < 3000 || isSubmitting}
           >
             {isSubmitting ? 'Generating PDF...' : <><MessageCircle size={20} /> Send Enquiry on WhatsApp <ArrowRight size={18} /></>}
           </button>

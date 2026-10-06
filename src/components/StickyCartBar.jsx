@@ -22,7 +22,7 @@ export default function StickyCartBar() {
     return null;
   }
 
-  const MIN_ORDER = 2500;
+  const MIN_ORDER = 3000;
   const isEligible = totalValue >= MIN_ORDER;
 
   const handleWhatsApp = async () => {
