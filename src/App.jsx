@@ -108,7 +108,7 @@ const Header = () => {
       {/* Top Announcement Bar */}
       <div className="marquee-container">
         <div className="marquee-content">
-          🔥 DIWALI MEGA SALE! FLAT 50% OFF WHOLESALE PRICES | FREE SHIPPING ON ORDERS OVER ₹10,000 | LIMITED TIME OFFER 🔥 &nbsp;&nbsp;&nbsp;&nbsp; 🔥 DIWALI MEGA SALE! FLAT 50% OFF WHOLESALE PRICES | FREE SHIPPING ON ORDERS OVER ₹10,000 | LIMITED TIME OFFER 🔥
+          🔥 DIWALI MEGA SALE! FLAT 50% OFF WHOLESALE PRICES | SHIPPING CHARGES APPLY | LIMITED TIME OFFER 🔥 &nbsp;&nbsp;&nbsp;&nbsp; 🔥 DIWALI MEGA SALE! FLAT 50% OFF WHOLESALE PRICES | SHIPPING CHARGES APPLY | LIMITED TIME OFFER 🔥
         </div>
       </div>
 
